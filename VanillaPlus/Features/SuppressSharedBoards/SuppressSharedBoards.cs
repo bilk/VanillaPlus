@@ -16,28 +16,29 @@ public class SuppressSharedBoards : GameModification {
         ],
     };
 
-    private delegate void ReceiveSharedPopupDelegate(nint thisPtr, byte a2, bool a3);
-    [Signature("48 89 6C 24 ?? 56 41 56 41 57 48 83 EC ?? 4C 8B F9 0F B6 EA", DetourName = nameof(ReceiveSharedPopupDetour))]
-    private Hook<ReceiveSharedPopupDelegate>? receiveSharedPopupHook;
+    // TODO: Replace with CS in 7.5
+    private delegate void ShowSharedNotificationDelegate(nint thisPtr, bool isNotRealTimeSharing, bool openNotif);
+    [Signature("48 89 6C 24 ?? 56 41 56 41 57 48 83 EC ?? 4C 8B F9 0F B6 EA", DetourName = nameof(ShowSharedNotificationDetour))]
+    private Hook<ShowSharedNotificationDelegate>? showSharedNotificationHook;
 
-    private delegate void ReceiveSharedSaveDelegate(nint thisPtr, nint a2, nint a3, int a4, uint a5);
-    [Signature("E8 ?? ?? ?? ?? 40 80 F5", DetourName = nameof(ReceiveSharedSaveDetour))]
-    private Hook<ReceiveSharedSaveDelegate>? receiveSharedSaveHook;
+    private delegate void SaveBoardAndPlaySoundDelegate(nint thisPtr, nint packetData, nint boardInfo, uint boardIndexInSharedFolder, uint totalBoardsInSharedFolder);
+    [Signature("E8 ?? ?? ?? ?? 40 80 F5", DetourName = nameof(SaveBoardAndPlaySoundDetour))]
+    private Hook<SaveBoardAndPlaySoundDelegate>? saveBoardAndPlaySoundHook;
 
     public override void OnEnable() {
         Services.GameInteropProvider.InitializeFromAttributes(this);
-        receiveSharedPopupHook?.Enable();
-        receiveSharedSaveHook?.Enable();
+        showSharedNotificationHook?.Enable();
+        saveBoardAndPlaySoundHook?.Enable();
     }
 
     public override void OnDisable() {
-        receiveSharedPopupHook?.Dispose();
-        receiveSharedPopupHook = null;
-        receiveSharedSaveHook?.Dispose();
-        receiveSharedSaveHook = null;
+        showSharedNotificationHook?.Dispose();
+        showSharedNotificationHook = null;
+        saveBoardAndPlaySoundHook?.Dispose();
+        saveBoardAndPlaySoundHook = null;
     }
 
-    private void ReceiveSharedPopupDetour(nint thisPtr, byte a2, bool a3) { }
+    private void ShowSharedNotificationDetour(nint thisPtr, bool isNotRealTimeSharing, bool openNotif) { }
 
-    private void ReceiveSharedSaveDetour(nint thisPtr, nint a2, nint a3, int a4, uint a5) { }
+    private void SaveBoardAndPlaySoundDetour(nint thisPtr, nint packetData, nint boardInfo, uint boardIndexInSharedFolder, uint totalBoardsInSharedFolder) { }
 }
